@@ -3,14 +3,18 @@ package com.solr.clientwrapper.rest;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.solr.clientwrapper.domain.dto.solrsearch.SolrSearchResponseDTO;
 
 @RestController
 public class TestingController {
 
-    @Autowired
-    private SolrClient solrClient;
-    private final static String solrDataName = "employee";
+
 	/*
 	 * @GetMapping("/addDocument") public SolrGetCapacityPlanDTO addDocument()
 	 * throws SolrServerException, IOException, URISyntaxException,
