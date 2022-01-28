@@ -1,8 +1,5 @@
 package com.searchclient.clientwrapper.domain.dto;
 
-import java.util.List;
-
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -12,27 +9,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Component
 public class SolrSearchResponseDTO {
-	private int statusCode;
-	private String responseMessage;
-	private Long numDocs;
-	private  List<JSONObject> solrDocuments;
+
+	private  Object solrDocuments;
 	
 
-	public SolrSearchResponseDTO(int statusCode, String responseMessage, Long numDocs, List<JSONObject> solrDocuments) {
+	public SolrSearchResponseDTO( Object solrDocuments) {
 		super();
-		this.statusCode = statusCode;
-		this.responseMessage = responseMessage;
-		this.numDocs = numDocs;
+		
 		this.solrDocuments =  solrDocuments;
 	}
 	
 	@Override
 	public String toString() {
 		
-		return "SolrSearchResponseDTO [statusCode=" + statusCode + ", "
-						+ "responseMessage=" + responseMessage + ","
-						+ "numDocs=" + numDocs + ","
-								+ "solrDocuments=" + solrDocuments +"]";
+		return "Response " + solrDocuments ;
 		
 	}
 
