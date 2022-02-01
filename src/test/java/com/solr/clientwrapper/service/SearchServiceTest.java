@@ -15,7 +15,7 @@ class SearchServiceTest {
 
 	
 	@Test
-	void testSolrCoreStatus() {
+	void testSearch() {
 		String expectedResponse = "Success";
 
 		// Get Status of Existing Core
