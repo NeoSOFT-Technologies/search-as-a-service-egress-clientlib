@@ -21,232 +21,202 @@ import lombok.Data;
 @Data
 public class MicroserviceHttpGateway {
 
-	private final Logger log = LoggerFactory.getLogger(MicroserviceHttpGateway.class);
+    private final Logger log = LoggerFactory.getLogger(MicroserviceHttpGateway.class);
 
-	private String apiEndpoint;
-	private Object requestBodyDTO;
+    private String apiEndpoint;
+    private Object requestBodyDTO;
 
-	public String postRequestWithStringBody() {
+    public String postRequestWithStringBody() {
 
-		String jsonObject = null;
-		log.debug("Post Request String Method Called in MicroserviceHttpGateway");
-		log.debug("API Endpoint - "+apiEndpoint);
+        String jsonObject = null;
+        log.debug("Post Request String Method Called in MicroserviceHttpGateway");
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpPost http = new HttpPost(apiEndpoint);
+        HttpPost http = new HttpPost(apiEndpoint);
 
-		try {
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-			String objJackson = requestBodyDTO.toString();
-			System.out.println("GATEWAY OBJ-JACKSON - "+objJackson);
-			StringEntity entity = new StringEntity(objJackson);
+            String objJackson = requestBodyDTO.toString();
+            StringEntity entity = new StringEntity(objJackson);
 
-			//StringEntity entity = new StringEntity((String) requestBodyDTO);
+            http.setEntity(entity);
+            http.setHeader("Accept", "application/json");
+            http.setHeader("Content-type", "application/json");
 
-			http.setEntity(entity);
-			http.setHeader("Accept", "application/json");
-			http.setHeader("Content-type", "application/json");
+            CloseableHttpResponse response = client.execute(http);
+            HttpEntity entityResponse = response.getEntity();
+            String result = EntityUtils.toString(entityResponse);
 
-			CloseableHttpResponse response = client.execute(http);
-			HttpEntity entityResponse = response.getEntity();
-			String result = EntityUtils.toString(entityResponse);
+            log.debug("RESPONSE: {}", result);
 
-			log.debug("RESPONSE: " + result);
+            jsonObject = result;
 
-			jsonObject = result;
+            client.close();
 
-			client.close();
+        } catch (Exception e) {
 
-		} catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
 
-			e.printStackTrace();
-			log.error(e.toString());
+        }
 
-		}
+        return jsonObject;
 
-		return jsonObject;
+    }
 
-	}
+    public JSONObject postRequest() {
 
-	public JSONObject postRequest() {
+        log.debug("Post Request Method Called in MicroserviceHttpGateway");
 
-		log.debug("Post Request Method Called in MicroserviceHttpGateway");
-		log.debug("API Endpoint -" + apiEndpoint);
-		log.debug("REQUEST BODY -"+ requestBodyDTO);
+        JSONObject jsonObject = null;
 
-		//System.out.println("Gateway postRequest"+requestBodyDTO);
+        HttpPost http = new HttpPost(apiEndpoint);
 
-		JSONObject jsonObject = null;
+        ObjectMapper objectMapper = new ObjectMapper();
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpPost http = new HttpPost(apiEndpoint);
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		
+            String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
 
-		try {
+            StringEntity entity = new StringEntity(objJackson);
 
-			String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
-			//String objJackson = requestBodyDTO.toString();
-			System.out.println("GATEWAY OBJ-JACKSON - "+objJackson);
-			StringEntity entity = new StringEntity((String) objJackson);
+            http.setEntity(entity);
+            http.setHeader("Accept", "application/json");
+            http.setHeader("Content-type", "application/json");
 
-			http.setEntity(entity);
-			http.setHeader("Accept", "application/json");
-			http.setHeader("Content-type", "application/json");
+            log.debug("Sending POST request");
 
-			log.debug("Sending POST request");
+            CloseableHttpResponse response = client.execute(http);
+            HttpEntity entityResponse = response.getEntity();
+            String result = EntityUtils.toString(entityResponse);
 
-			CloseableHttpResponse response = client.execute(http);
-			HttpEntity entityResponse = response.getEntity();
-			String result = EntityUtils.toString(entityResponse);
+            log.debug("RESPONSE: {}", result);
 
-			log.debug("RESPONSE: " + result);
+            jsonObject = new JSONObject(result);
 
-			jsonObject = new JSONObject(result);
+            client.close();
 
-			client.close();
+        } catch (Exception e) {
 
-		} catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
 
-			e.printStackTrace();
-			log.error(e.toString());
+        }
 
-		}
+        return jsonObject;
 
-		return jsonObject;
+    }
 
-	}
+    public JSONObject putRequest() {
+        log.debug("Put Request Method Called in MicroserviceHttpGateway");
 
-	public JSONObject putRequest() {
-		log.debug("Put Request Method Called in MicroserviceHttpGateway");
-		log.debug("API Endpoint -" + apiEndpoint);
+        JSONObject jsonObject = null;
 
-		JSONObject jsonObject = null;
+        HttpPut http = new HttpPut(apiEndpoint);
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpPut http = new HttpPut(apiEndpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
 
-		ObjectMapper objectMapper = new ObjectMapper();
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-		try {
+            String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
+            StringEntity entity = new StringEntity(objJackson);
 
-			String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
-			StringEntity entity = new StringEntity(objJackson);
+            http.setEntity(entity);
+            http.setHeader("Accept", "application/json");
+            http.setHeader("Content-type", "application/json");
+            log.debug("Sending DELETE request");
 
-			http.setEntity(entity);
-			http.setHeader("Accept", "application/json");
-			http.setHeader("Content-type", "application/json");
-			log.debug("Sending DELETE request");
+            CloseableHttpResponse response = client.execute(http);
+            HttpEntity entityResponse = response.getEntity();
+            String result = EntityUtils.toString(entityResponse);
+            log.debug("RESPONSE: {}", result);
 
-			CloseableHttpResponse response = client.execute(http);
-			HttpEntity entityResponse = response.getEntity();
-			String result = EntityUtils.toString(entityResponse);
-			log.debug("RESPONSE: " + result);
+            jsonObject = new JSONObject(result);
 
-			jsonObject = new JSONObject(result);
+            client.close();
 
-			client.close();
+        } catch (Exception e) {
 
-		} catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
 
-			e.printStackTrace();
-			log.error(e.toString());
+        }
 
-		}
+        return jsonObject;
 
-		return jsonObject;
+    }
 
-	}
+    public JSONObject deleteRequest() {
+        log.debug("Delete Request Method Called in MicroserviceHttpGateway");
 
-	public JSONObject deleteRequest() {
-		log.debug("Delete Request Method Called in MicroserviceHttpGateway");
-		log.debug("API Endpoint -" + apiEndpoint);
+        JSONObject jsonObject = null;
 
-		JSONObject jsonObject = null;
+        HttpDelete http = new HttpDelete(apiEndpoint);
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpDelete http = new HttpDelete(apiEndpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
 
-		ObjectMapper objectMapper = new ObjectMapper();
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            http.setHeader("Accept", "application/json");
+            http.setHeader("Content-type", "application/json");
 
-		try {
+            CloseableHttpResponse response = client.execute(http);
+            HttpEntity entityResponse = response.getEntity();
+            String result = EntityUtils.toString(entityResponse);
 
-			String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
-			StringEntity entity = new StringEntity(objJackson);
+            jsonObject = new JSONObject(result);
 
-			http.setHeader("Accept", "application/json");
-			http.setHeader("Content-type", "application/json");
+            client.close();
 
-			CloseableHttpResponse response = client.execute(http);
-			HttpEntity entityResponse = response.getEntity();
-			String result = EntityUtils.toString(entityResponse);
-			log.debug("RESPONSE: " + result);
+        } catch (Exception e) {
 
-			jsonObject = new JSONObject(result);
+            e.printStackTrace();
+            log.error(e.toString());
 
-			client.close();
+        }
 
-		} catch (Exception e) {
+        return jsonObject;
 
-			e.printStackTrace();
-			log.error(e.toString());
+    }
 
-		}
+    public JSONObject getRequest() {
 
-		return jsonObject;
+        JSONObject jsonObject = null;
 
+        HttpGet http = new HttpGet(apiEndpoint);
 
-	}
+        ObjectMapper objectMapper = new ObjectMapper();
 
-	public JSONObject getRequest() {
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-		JSONObject jsonObject = null;
+            http.setHeader("Accept", "application/json");
+            http.setHeader("Content-type", "application/json");
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpGet http = new HttpGet(apiEndpoint);
+            CloseableHttpResponse response = client.execute(http);
+            HttpEntity entityResponse = response.getEntity();
+            String result = EntityUtils.toString(entityResponse);
+            log.debug("RESPONSE: {}", result);
 
-		ObjectMapper objectMapper = new ObjectMapper();
+            jsonObject = new JSONObject(result);
 
-		try {
+            client.close();
 
-			String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
-			StringEntity entity = new StringEntity(objJackson);
+        } catch (Exception e) {
 
-			http.setHeader("Accept", "application/json");
-			http.setHeader("Content-type", "application/json");
+            e.printStackTrace();
+            log.error(e.toString());
 
-			CloseableHttpResponse response = client.execute(http);
-			HttpEntity entityResponse = response.getEntity();
-			String result = EntityUtils.toString(entityResponse);
-			log.debug("RESPONSE: " + result);
+        }
 
-			jsonObject = new JSONObject(result);
+        return jsonObject;
 
-			client.close();
+    }
 
-		} catch (Exception e) {
+    public String stringRequest() {
 
-			e.printStackTrace();
-			log.error(e.toString());
-
-		}
-
-		return jsonObject;
-
-	}
-
-    public String stringRequest(){ 
-
-        CloseableHttpClient client = HttpClients.createDefault();
         HttpGet http = new HttpGet(apiEndpoint);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String result = null;
-        try {
-
-            String objJackson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyDTO);
-            StringEntity entity = new StringEntity(objJackson);
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
             http.setHeader("Accept", "application/json");
             http.setHeader("Content-type", "application/json");
@@ -254,9 +224,7 @@ public class MicroserviceHttpGateway {
             CloseableHttpResponse response = client.execute(http);
             HttpEntity entityResponse = response.getEntity();
             result = EntityUtils.toString(entityResponse);
-            log.debug("RESPONSE: "+ result);
-
-           
+            log.debug("RESPONSE: {}", result);
 
             client.close();
 
