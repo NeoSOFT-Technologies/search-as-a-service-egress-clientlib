@@ -12,7 +12,7 @@ import com.searchclient.clientwrapper.domain.port.api.SolrSearchRecordsServicePo
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 
 @Service
-public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
+public class SearchService implements SolrSearchRecordsServicePort {
     /*
      * Solr Search Records for given collection- Egress Service
      */
@@ -21,7 +21,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
     @Value("${base-microservice-url}")
     private String baseMicroserviceUrl;
 
-    private final Logger logger = LoggerFactory.getLogger(SolrSearchRecordsService.class);
+    private final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
     SolrSearchResponseDTO solrSearchResponseDTO;
