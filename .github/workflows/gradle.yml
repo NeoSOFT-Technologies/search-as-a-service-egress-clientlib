@@ -36,8 +36,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
       - name: Build and analyze
         run: ./gradlew build jacocoTestReport sonarqube --info
-        with:
-          threshold: 70
+
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
