@@ -31,7 +31,6 @@ public class MicroserviceHttpGateway {
 		String jsonObject = null;
 		log.debug("Post Request String Method Called in MicroserviceHttpGateway");
 		log.debug("API Endpoint - "+apiEndpoint);
-		log.debug("Request Body - "+requestBodyDTO);
 
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost http = new HttpPost(apiEndpoint);
