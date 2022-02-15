@@ -1,6 +1,7 @@
 package com.searchclient.clientwrapper.domain.port.api;
 
 import com.searchclient.clientwrapper.domain.dto.SolrSearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
 
 public interface SolrSearchRecordsServicePort {
 		
@@ -11,6 +12,7 @@ public interface SolrSearchRecordsServicePort {
 										String startRecord, 
 										String pageSize, 
 										String tag, 
-										String order);
+										String order,
+										LoggersDTO loggersDTO);
 	
 }
