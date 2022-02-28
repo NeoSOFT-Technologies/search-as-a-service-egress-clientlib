@@ -43,7 +43,13 @@ public class SearchService implements SolrSearchRecordsServicePort {
 	}
     
     @Override
-    public SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(String tableName, String queryField, String searchTerm, String startRecord, String pageSize, String orderBy, String order,LoggersDTO loggersDTO) {
+    public SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(
+    		String tableName, 
+    		String queryField, String searchTerm, 
+    		String startRecord, 
+    		String pageSize, 
+    		String orderBy, String order, 
+    		LoggersDTO loggersDTO) {
         /* Egress API -- solr collection records -- ADVANCED SEARCH */
         logger.debug("Performing ADVANCED solr search for given collection");
         
