@@ -3,9 +3,10 @@ package com.searchclient.clientwrapper.domain.port.api;
 import com.searchclient.clientwrapper.domain.dto.SolrSearchResponseDTO;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
 
-public interface SolrSearchRecordsServicePort {
+public interface SolrSearchServicePort {
 		
-	SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(	
+	SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(
+										int clientId, 
 										String collection, 
 										String queryField, 
 										String searchTerm, 
@@ -14,5 +15,15 @@ public interface SolrSearchRecordsServicePort {
 										String tag, 
 										String order,
 										LoggersDTO loggersDTO);
+	
+	SolrSearchResponseDTO setUpSelectQuerySearchViaQuery(
+			int clientId, 
+			String tableName, 
+			String searchQuery, 
+			String startRecord, 
+			String pageSize, 
+			String orderBy, 
+			String order,
+			LoggersDTO loggersDTO);
 	
 }
