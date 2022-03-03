@@ -1,11 +1,11 @@
 package com.searchclient.clientwrapper.domain.port.api;
 
-import com.searchclient.clientwrapper.domain.dto.SolrSearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.SearchResponseDTO;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
 
-public interface SolrSearchServicePort {
+public interface SearchServicePort {
 		
-	SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(
+	SearchResponseDTO setUpSelectQueryAdvancedSearch(
 										int clientId, 
 										String collection, 
 										String queryField, 
@@ -16,7 +16,7 @@ public interface SolrSearchServicePort {
 										String order,
 										LoggersDTO loggersDTO);
 	
-	SolrSearchResponseDTO setUpSelectQuerySearchViaQuery(
+	SearchResponseDTO setUpSelectQuerySearchViaQuery(
 			int clientId, 
 			String tableName, 
 			String searchQuery, 

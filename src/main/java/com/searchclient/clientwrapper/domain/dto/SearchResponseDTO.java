@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Component
-public class SolrSearchResponseDTO {
+public class SearchResponseDTO {
 
 	private  Object solrDocuments;
 	
 
-	public SolrSearchResponseDTO( Object solrDocuments) {
+	public SearchResponseDTO( Object solrDocuments) {
 		super();
 		
 		this.solrDocuments =  solrDocuments;

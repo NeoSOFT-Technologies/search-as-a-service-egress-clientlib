@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchclient.clientwrapper.domain.dto.SolrSearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.SearchResponseDTO;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
-import com.searchclient.clientwrapper.domain.port.api.SolrSearchServicePort;
+import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 
 @Service
-public class SearchService implements SolrSearchServicePort {
+public class SearchService implements SearchServicePort {
     /*
      * Solr Search Records for given collection- Egress Service
      */
@@ -30,7 +30,7 @@ public class SearchService implements SolrSearchServicePort {
 	private String username = "Username";
 
     @Autowired
-    SolrSearchResponseDTO solrSearchResponseDTO;
+    SearchResponseDTO solrSearchResponseDTO;
 
     private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
@@ -42,7 +42,7 @@ public class SearchService implements SolrSearchServicePort {
 	}
     
     @Override
-    public SolrSearchResponseDTO setUpSelectQueryAdvancedSearch(
+    public SearchResponseDTO setUpSelectQueryAdvancedSearch(
     		int clientId, 
     		String tableName, 
     		String queryField, String searchTerm, 
@@ -78,7 +78,7 @@ public class SearchService implements SolrSearchServicePort {
     }
 
 	@Override
-	public SolrSearchResponseDTO setUpSelectQuerySearchViaQuery(
+	public SearchResponseDTO setUpSelectQuerySearchViaQuery(
 			int clientId, String tableName, 
 			String searchQuery,
 			String startRecord, String pageSize, String orderBy, String order, LoggersDTO loggersDTO) {
