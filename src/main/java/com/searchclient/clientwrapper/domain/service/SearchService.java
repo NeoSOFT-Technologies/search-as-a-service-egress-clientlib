@@ -1,4 +1,4 @@
-package com.searchclient.clientwrapper.service;
+package com.searchclient.clientwrapper.domain.service;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchclient.clientwrapper.domain.dto.SearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
+import com.searchclient.clientwrapper.domain.errors.OperationNotAllowedException;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
+import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 
 @Service
 public class SearchService implements SearchServicePort {
@@ -30,7 +32,7 @@ public class SearchService implements SearchServicePort {
 	private String username = "Username";
 
     @Autowired
-    SearchResponseDTO solrSearchResponseDTO;
+    SearchResponse solrSearchResponseDTO;
 
     private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
@@ -42,7 +44,7 @@ public class SearchService implements SearchServicePort {
 	}
     
     @Override
-    public SearchResponseDTO setUpSelectQueryAdvancedSearch(
+    public SearchResponse setUpSelectQuerySearchViaQueryField(
     		int clientId, 
     		String tableName, 
     		String queryField, String searchTerm, 
@@ -57,6 +59,16 @@ public class SearchService implements SearchServicePort {
 		requestMethod(loggersDTO, nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);	
 		
+		// Perform Validations on input data
+		// VALIDATE queryField
+		boolean isQueryFieldValidated = SearchUtil.checkIfNameIsAlphaNumeric(queryField.trim());
+		if(!isQueryFieldValidated) {
+			solrSearchResponseDTO.setStatusCode(406);
+			solrSearchResponseDTO.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
+			solrSearchResponseDTO.setSolrDocuments(null);
+			return solrSearchResponseDTO;
+		}
+					
         MicroserviceHttpGateway microserviceHttpGateway = new MicroserviceHttpGateway();
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
@@ -78,12 +90,12 @@ public class SearchService implements SearchServicePort {
     }
 
 	@Override
-	public SearchResponseDTO setUpSelectQuerySearchViaQuery(
+	public SearchResponse setUpSelectQuerySearchViaQuery(
 			int clientId, String tableName, 
 			String searchQuery,
 			String startRecord, String pageSize, String orderBy, String order, LoggersDTO loggersDTO) {
         /* Egress API -- solr collection records -- ADVANCED SEARCH */
-        logger.debug("Performing ADVANCED solr search for given collection");
+        logger.debug("Performing solr search VIA QUERY BUILDER for given collection");
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);

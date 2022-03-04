@@ -1,11 +1,11 @@
 package com.searchclient.clientwrapper.domain.port.api;
 
-import com.searchclient.clientwrapper.domain.dto.SearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
 
 public interface SearchServicePort {
 		
-	SearchResponseDTO setUpSelectQueryAdvancedSearch(
+	SearchResponse setUpSelectQuerySearchViaQueryField(
 										int clientId, 
 										String collection, 
 										String queryField, 
@@ -16,14 +16,14 @@ public interface SearchServicePort {
 										String order,
 										LoggersDTO loggersDTO);
 	
-	SearchResponseDTO setUpSelectQuerySearchViaQuery(
-			int clientId, 
-			String tableName, 
-			String searchQuery, 
-			String startRecord, 
-			String pageSize, 
-			String orderBy, 
-			String order,
-			LoggersDTO loggersDTO);
+	SearchResponse setUpSelectQuerySearchViaQuery(
+										int clientId, 
+										String tableName, 
+										String searchQuery, 
+										String startRecord, 
+										String pageSize, 
+										String orderBy, 
+										String order,
+										LoggersDTO loggersDTO);
 	
 }

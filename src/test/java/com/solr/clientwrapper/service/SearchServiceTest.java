@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.searchclient.clientwrapper.domain.dto.SearchResponseDTO;
+import com.searchclient.clientwrapper.domain.dto.SearchResponse;
+import com.searchclient.clientwrapper.domain.service.SearchService;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
-import com.searchclient.clientwrapper.service.SearchService;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -61,7 +61,7 @@ class SearchServiceTest {
 	}
 
 	public void setMockitoSuccessResponseForService() {
-		SearchResponseDTO solrResponseDTO = new SearchResponseDTO();
+		SearchResponse solrResponseDTO = new SearchResponse();
 //		solrResponseDTO.setCode(200);
 //		solrResponseDTO.setMessage("Testing");
 
@@ -81,7 +81,7 @@ class SearchServiceTest {
 	}
 
 	public void setMockitoBadResponseForService() {
-		SearchResponseDTO solrResponseDTO = new SearchResponseDTO();
+		SearchResponse solrResponseDTO = new SearchResponse();
 //		solrResponseDTO.setCode(400);
 //		solrResponseDTO.setMessage("Testing");
 		JsonObject = new JSONObject(solrResponseDTO);
