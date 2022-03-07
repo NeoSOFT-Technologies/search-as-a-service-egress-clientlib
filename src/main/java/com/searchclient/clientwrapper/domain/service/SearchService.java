@@ -16,7 +16,8 @@ import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 
 @Service
 public class SearchService implements SearchServicePort {
-    private static final String STATUS_CODE = "statusCode";
+    private static final String RESULTS = "results";
+	private static final String STATUS_CODE = "statusCode";
 	private static final String QUERY_PROCESS_ERROR = "Could not execute query to fetch records. URL: %s";
 	/*
      * Solr Search Records for given collection- Egress Service
@@ -95,7 +96,7 @@ public class SearchService implements SearchServicePort {
             } else {
         		searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
                 searchResponse.setMessage(jsonObject.get("responseMessage").toString());
-                searchResponse.setSolrDocuments(jsonObject.get("results"));
+                searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
             }
             logger.debug("completed service run");
             
@@ -143,12 +144,12 @@ public class SearchService implements SearchServicePort {
             
             // testing
             logger.info("gateway >>>>>>> {}", microserviceHttpGateway.getRequest());
-            logger.info("gateway obj >>>>>>> {}", jsonObject.get("results"));
+            logger.info("gateway obj >>>>>>> {}", jsonObject.get(RESULTS));
             
 			searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
 			searchResponse.setMessage(jsonObject.get("responseMessage").toString());
 			if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) != 400)
-				searchResponse.setSolrDocuments(jsonObject.get("results"));
+				searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
 			else
 				searchResponse.setSolrDocuments(jsonObject.get(null));
             logger.debug("completed service run");

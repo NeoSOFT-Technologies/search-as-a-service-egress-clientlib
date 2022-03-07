@@ -2,7 +2,6 @@ package com.searchclient.clientwrapper.domain.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.json.JSONObject;
@@ -22,7 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
-import com.searchclient.clientwrapper.domain.service.SearchService;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 

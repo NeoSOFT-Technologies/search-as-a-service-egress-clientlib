@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 
 public class SearchUtil {
 	
@@ -29,19 +26,6 @@ public class SearchUtil {
 	}
 	
 	
-	public static boolean isQueryFieldMultivalued(String queryField, JSONArray currentTableSchema) {
-		boolean isMultivalued = false;
-		for(Object col: currentTableSchema) {
-			JSONObject colObj = (JSONObject)col;
-			isMultivalued = colObj.get("name").equals(queryField) && colObj.get("multiValue").equals(true);
-			if(isMultivalued)
-				break;
-		}
-
-		return isMultivalued;
-	}
-	
-	
 	// Utitlity functions
 	public static List<String> getTrimmedListOfStrings(List<String> list) {
 		List<String> trimmedList = new ArrayList<>();
@@ -53,16 +37,4 @@ public class SearchUtil {
 		return trimmedList;
 	}
 
-
-	public static void setQueryForMultivaluedField(
-			String queryField, List<String> searchTerms, StringBuilder queryString) {
-		int counter = 0;
-		for (String val : searchTerms) {
-			if (counter == 0)
-				queryString.append(queryField + ":" + val);
-			else
-				queryString.append(" AND " + queryField + ":" + val);
-			counter++;
-		}
-	}
 }

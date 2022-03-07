@@ -5,10 +5,10 @@ package com.searchclient.clientwrapper.domain.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -17,40 +17,19 @@ import org.junit.jupiter.api.Test;
  */
 class SearchUtilTest {
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterEach
-	void tearDown() throws Exception {
-	}
+	private static final String ALPHA_NUMERIC_STRING = "IAmIronMan";
+	private static final String NOT_JUST_ALPHA_NUMERIC_STRING = "I_Am_Iron_Man";
+	
 
 	/**
 	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.SearchUtil#checkIfNameIsAlphaNumeric(java.lang.String)}.
 	 */
 	@Test
 	void testCheckIfNameIsAlphaNumeric() {
-		//fail("Not yet implemented");
+		boolean isAlphaNumeric = SearchUtil.checkIfNameIsAlphaNumeric(ALPHA_NUMERIC_STRING);
+		assertTrue(isAlphaNumeric);
+		isAlphaNumeric = SearchUtil.checkIfNameIsAlphaNumeric(NOT_JUST_ALPHA_NUMERIC_STRING);
+		assertFalse(isAlphaNumeric);
 	}
 
 	/**
@@ -58,15 +37,10 @@ class SearchUtilTest {
 	 */
 	@Test
 	void testIsAlphaNumeric() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.SearchUtil#isQueryFieldMultivalued(java.lang.String, org.json.JSONArray)}.
-	 */
-	@Test
-	void testIsQueryFieldMultivalued() {
-		fail("Not yet implemented");
+		boolean isAlphaNumeric = SearchUtil.isAlphaNumeric(ALPHA_NUMERIC_STRING);
+		assertTrue(isAlphaNumeric);
+		isAlphaNumeric = SearchUtil.isAlphaNumeric(NOT_JUST_ALPHA_NUMERIC_STRING);
+		assertFalse(isAlphaNumeric);
 	}
 
 	/**
@@ -74,15 +48,12 @@ class SearchUtilTest {
 	 */
 	@Test
 	void testGetTrimmedListOfStrings() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.SearchUtil#setQueryForMultivaluedField(java.lang.String, java.util.List, java.lang.StringBuilder)}.
-	 */
-	@Test
-	void testSetQueryForMultivaluedField() {
-		fail("Not yet implemented");
+		List<String> untrimmedListOfStrings = new ArrayList<>(Arrays.asList("  IronMan ", "Batman    ", "      Spidy"));
+		List<String> trimmedListOfStrings = new ArrayList<>(Arrays.asList("IronMan", "Batman", "Spidy"));
+		List<String> processedListOfStrings = SearchUtil.getTrimmedListOfStrings(untrimmedListOfStrings);
+		for(int i=0; i<trimmedListOfStrings.size(); i++) {
+			assertEquals(trimmedListOfStrings.get(i), processedListOfStrings.get(i));
+		}
 	}
 
 }
