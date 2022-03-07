@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
-import com.searchclient.clientwrapper.domain.errors.OperationNotAllowedException;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
@@ -17,7 +16,9 @@ import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 
 @Service
 public class SearchService implements SearchServicePort {
-    /*
+    private static final String STATUS_CODE = "statusCode";
+	private static final String QUERY_PROCESS_ERROR = "Could not execute query to fetch records. URL: %s";
+	/*
      * Solr Search Records for given collection- Egress Service
      */
     @Value("${microservice.base-url}")
@@ -32,7 +33,9 @@ public class SearchService implements SearchServicePort {
 	private String username = "Username";
 
     @Autowired
-    SearchResponse solrSearchResponseDTO;
+    SearchResponse searchResponse = new SearchResponse();
+    @Autowired
+    MicroserviceHttpGateway microserviceHttpGateway;
 
     private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
@@ -52,24 +55,24 @@ public class SearchService implements SearchServicePort {
     		String pageSize, 
     		String orderBy, String order, 
     		LoggersDTO loggersDTO) {
-        /* Egress API -- solr collection records -- ADVANCED SEARCH */
-        logger.debug("Performing ADVANCED solr search for given collection");
+        /* Egress API -- table records -- SEARCH VIA QUERY FIELD */
+        logger.debug("Performing search-records VIA QUERY FIELD for given table");
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
+        requestMethod(loggersDTO, nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);	
-		
+
 		// Perform Validations on input data
 		// VALIDATE queryField
 		boolean isQueryFieldValidated = SearchUtil.checkIfNameIsAlphaNumeric(queryField.trim());
+
 		if(!isQueryFieldValidated) {
-			solrSearchResponseDTO.setStatusCode(406);
-			solrSearchResponseDTO.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
-			solrSearchResponseDTO.setSolrDocuments(null);
-			return solrSearchResponseDTO;
+			searchResponse.setStatusCode(406);
+			searchResponse.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
+			searchResponse.setSolrDocuments(null);
+			return searchResponse;
 		}
 					
-        MicroserviceHttpGateway microserviceHttpGateway = new MicroserviceHttpGateway();
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
         		+ "/" + clientId
@@ -78,31 +81,54 @@ public class SearchService implements SearchServicePort {
         		+ "&startRecord=" + startRecord
                 + "&pageSize=" + pageSize
                 + "&orderBy=" + orderBy + "&order=" + order);
-        JSONObject jsonObject = microserviceHttpGateway.getRequest();
-        
-        solrSearchResponseDTO.setSolrDocuments(jsonObject);
-        logger.debug("completed service run");
-        
-        loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
-		LoggerUtils.printlogger(loggersDTO,false,false);
-        
-        return solrSearchResponseDTO;
+
+        try {
+            JSONObject jsonObject = microserviceHttpGateway.getRequest();
+
+            if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400) {
+            	searchResponse.setStatusCode(400);
+            	searchResponse.setMessage(
+            			String.format(
+            					QUERY_PROCESS_ERROR, 
+            					microserviceHttpGateway.getApiEndpoint()));
+            	searchResponse.setSolrDocuments(null);
+            } else {
+        		searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
+                searchResponse.setMessage(jsonObject.get("responseMessage").toString());
+                searchResponse.setSolrDocuments(jsonObject.get("results"));
+            }
+            logger.debug("completed service run");
+            
+            loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
+    		LoggerUtils.printlogger(loggersDTO,false,false);
+            
+        } catch (Exception e) {
+        	logger.error("Exception occurred while performing getRequest operation via Http Gateway: {}", e.getMessage());
+        	searchResponse.setStatusCode(400);
+        	searchResponse.setMessage(
+        			String.format(
+        					QUERY_PROCESS_ERROR, 
+        					microserviceHttpGateway.getApiEndpoint()));
+        	searchResponse.setSolrDocuments(null);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
+        }
+
+        return searchResponse;
     }
 
 	@Override
 	public SearchResponse setUpSelectQuerySearchViaQuery(
 			int clientId, String tableName, 
-			String searchQuery,
+			String searchQuery, 
 			String startRecord, String pageSize, String orderBy, String order, LoggersDTO loggersDTO) {
-        /* Egress API -- solr collection records -- ADVANCED SEARCH */
-        logger.debug("Performing solr search VIA QUERY BUILDER for given collection");
+        /* Egress API -- table records -- SEARCH VIA QUERY BUILDER */
+        logger.debug("Performing search-records VIA QUERY BUILDER for given table");
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		apiEndpoint = "/query";
-        MicroserviceHttpGateway microserviceHttpGateway = new MicroserviceHttpGateway();
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
         		+ "/" + clientId
@@ -111,15 +137,40 @@ public class SearchService implements SearchServicePort {
         		+ "&startRecord=" + startRecord
                 + "&pageSize=" + pageSize
                 + "&orderBy=" + orderBy + "&order=" + order);
-        JSONObject jsonObject = microserviceHttpGateway.getRequest();
         
-        solrSearchResponseDTO.setSolrDocuments(jsonObject);
-        logger.debug("completed service run");
+        try {
+            JSONObject jsonObject = microserviceHttpGateway.getRequest();
+            
+            // testing
+            logger.info("gateway >>>>>>> {}", microserviceHttpGateway.getRequest());
+            logger.info("gateway obj >>>>>>> {}", jsonObject.get("results"));
+            
+			searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
+			searchResponse.setMessage(jsonObject.get("responseMessage").toString());
+			if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) != 400)
+				searchResponse.setSolrDocuments(jsonObject.get("results"));
+			else
+				searchResponse.setSolrDocuments(jsonObject.get(null));
+            logger.debug("completed service run");
+            
+            loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
+    		LoggerUtils.printlogger(loggersDTO,false,false);
+            
+        } catch (Exception e) {
+        	logger.error("Exception occurred while performing getRequest operation via Http Gateway: {}", e.getMessage());
+        	searchResponse.setStatusCode(400);
+        	searchResponse.setMessage(
+        			String.format(
+        					QUERY_PROCESS_ERROR, 
+        					microserviceHttpGateway.getApiEndpoint()));
+        	searchResponse.setSolrDocuments(null);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
+        }
         
-        loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
-		LoggerUtils.printlogger(loggersDTO,false,false);
-        
-        return solrSearchResponseDTO;
+        // testing
+        logger.info("searchResponse ######## {}", searchResponse);
+
+        return searchResponse;
 	}
 
 }

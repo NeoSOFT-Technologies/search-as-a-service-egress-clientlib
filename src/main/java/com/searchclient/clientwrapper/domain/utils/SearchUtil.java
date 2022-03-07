@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 public class SearchUtil {
 	
 	private SearchUtil() {}
