@@ -15,5 +15,14 @@ logging:
     org.springframework.web: "debug"
     org.hibernate: "error"
     com.searchclient.clientwrapper.*: DEBUG
+#================================================================
+
+
+#================================================================
+#General configurations
+microservice:
+  base-url: http://localhost:8082
+  version: /search/api/v1
+
 
 #================================================================

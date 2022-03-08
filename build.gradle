@@ -9,7 +9,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '11'
 apply from: "gradle/sonar.gradle"
 
 repositories {
@@ -35,7 +35,7 @@ task clientLibraryCustomJar(type: Jar) {
 	manifest {
 		//attributes 'Main-Class': 'com.solr.clientwrapper.BasicSampleApp'
 	}
-	baseName = 'saas-clientlib-fat-0.0.2'
+	baseName = 'saas-egress-clientlib-fat'
 	from {
 		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 	}
