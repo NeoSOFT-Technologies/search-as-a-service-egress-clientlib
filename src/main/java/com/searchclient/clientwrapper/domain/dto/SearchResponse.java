@@ -4,13 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-@Data
-@NoArgsConstructor
-@ToString
 @Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchResponse {
@@ -19,9 +12,26 @@ public class SearchResponse {
 	private String message;
 	private  Object solrDocuments;
 	
-
-	public SearchResponse( Object solrDocuments) {
-		this.solrDocuments =  solrDocuments;
+	
+	public SearchResponse() {}
+	
+	public int getStatusCode() {
+		return statusCode;
+	}
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public Object getSolrDocuments() {
+		return solrDocuments;
+	}
+	public void setSolrDocuments(Object solrDocuments) {
+		this.solrDocuments = solrDocuments;
 	}
 	
 }

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
-import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
+import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
@@ -38,7 +38,7 @@ public class SearchService implements SearchServicePort {
     @Autowired
     MicroserviceHttpGateway microserviceHttpGateway;
 
-    private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
+    private void requestMethod(Loggers loggersDTO, String nameofCurrMethod) {
 
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
@@ -55,7 +55,7 @@ public class SearchService implements SearchServicePort {
     		String startRecord, 
     		String pageSize, 
     		String orderBy, String order, 
-    		LoggersDTO loggersDTO) {
+    		Loggers loggersDTO) {
         /* Egress API -- table records -- SEARCH VIA QUERY FIELD */
         logger.debug("Performing search-records VIA QUERY FIELD for given table");
         
@@ -121,7 +121,7 @@ public class SearchService implements SearchServicePort {
 	public SearchResponse setUpSelectQuerySearchViaQuery(
 			int clientId, String tableName, 
 			String searchQuery, 
-			String startRecord, String pageSize, String orderBy, String order, LoggersDTO loggersDTO) {
+			String startRecord, String pageSize, String orderBy, String order, Loggers loggersDTO) {
         /* Egress API -- table records -- SEARCH VIA QUERY BUILDER */
         logger.debug("Performing search-records VIA QUERY BUILDER for given table");
         

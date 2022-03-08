@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.searchclient.clientwrapper.domain.dto.logger.CorrelationID;
-import com.searchclient.clientwrapper.domain.dto.logger.LoggersDTO;
+import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 
 
 public class LoggerUtils {
@@ -28,10 +28,10 @@ public class LoggerUtils {
 		
 	}
 
-	public static LoggersDTO getRequestLoggingInfo(String servicename, String username, String nameofmethod,
+	public static Loggers getRequestLoggingInfo(String servicename, String username, String nameofmethod,
 			String timestamp) {
 
-		LoggersDTO loggersDTO = new LoggersDTO();
+		Loggers loggersDTO = new Loggers();
 		try {
 			ip = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
@@ -52,7 +52,7 @@ public class LoggerUtils {
 
 	}
 
-	public static void printlogger(LoggersDTO loggersDTO, boolean isStart, boolean isFailed) {
+	public static void printlogger(Loggers loggersDTO, boolean isStart, boolean isFailed) {
 		if (isFailed) {
 
 			logger.debug(

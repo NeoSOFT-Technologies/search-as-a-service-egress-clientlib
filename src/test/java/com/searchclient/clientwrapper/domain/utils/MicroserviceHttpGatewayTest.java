@@ -1,142 +1,54 @@
-/**
- * 
- */
 package com.searchclient.clientwrapper.domain.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
-
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * @author user
- *
- */
+
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 class MicroserviceHttpGatewayTest {
 
-	@MockBean
-	Logger logger;
-	@InjectMocks
+	HttpGatewayUtil gatewayUtil = new HttpGatewayUtil();
 	MicroserviceHttpGateway gateway = new MicroserviceHttpGateway();
-	
+		
 	String apiEndpoint = "http://localhost:8082/search/api/v1/911/partial6?queryField=title&searchTerm=David&startRecord=0&pageSize=5&orderBy=id&order=asc";
 	HttpGet httpGet = new HttpGet(apiEndpoint);
-	
+	HttpGet httpGetSetUp = new HttpGet();
+	CloseableHttpClient httpClientSetUp = HttpClients.createDefault();
 
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#getRequest()}.
-	 * @throws IOException 
-	 * @throws ClientProtocolException 
-	 */
-	@Test
-	void testGetRequest() throws ClientProtocolException, IOException {
-		
-		CloseableHttpClient closeableHttpClient = mock(CloseableHttpClient.class);
-		CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
-		StatusLine statusLine = mock(StatusLine.class);
-		Mockito.when(statusLine.getStatusCode()).thenReturn(200);
-		Mockito.when(closeableHttpResponse.getStatusLine()).thenReturn(statusLine);
-		Mockito.when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
-		
-		
-		int responseStatus = closeableHttpResponse.getStatusLine().getStatusCode();
-		
-		JSONObject jsonObject = gateway.extracted(httpGet, closeableHttpClient);
-		
-		assertEquals(responseStatus, jsonObject.get("statusCode"));
-		
-		//fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#getLog()}.
-	 */
-	@Test
-	void testGetLog() {
-		fail("Not yet implemented");
+	public void setUpExtracted(HttpGet httpGetPrepared, CloseableHttpClient httpClientPrepared) {
+		httpGetSetUp = httpGetPrepared;
+		httpClientSetUp = httpClientPrepared;
 	}
 
 	/**
 	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#getApiEndpoint()}.
 	 */
 	@Test
-	void testGetApiEndpoint() {
-		fail("Not yet implemented");
+	void testGetSetApiEndpoint() {
+		String dummyEndpoint = "my/endpoint";
+		gateway.setApiEndpoint(dummyEndpoint);
+		String receivedEndpoint = gateway.getApiEndpoint();
+		assertEquals(dummyEndpoint, receivedEndpoint);
 	}
 
 	/**
 	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#getRequestBodyDTO()}.
 	 */
 	@Test
-	void testGetRequestBodyDTO() {
-		fail("Not yet implemented");
+	void testGetSetRequestBodyDTO() {
+		Object dummyReqBody = "{\"reqBody\":\"SKD\"}";
+		gateway.setRequestBodyDTO(dummyReqBody);
+		Object receivedReqBody = gateway.getRequestBodyDTO();
+		assertEquals(dummyReqBody, receivedReqBody);
 	}
 
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#setApiEndpoint(String)}.
-	 */
-	@Test
-	void testSetApiEndpoint() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway#setRequestBodyDTO(Object)}.
-	 */
-	@Test
-	void testSetRequestBodyDTO() {
-		fail("Not yet implemented");
-	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterEach
-	void tearDown() throws Exception {
-	}
 }
