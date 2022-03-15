@@ -86,9 +86,9 @@ dependencies {
 	 implementation "org.apache.commons:commons-lang3"
 	 // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
-	implementation group: 'org.json', name: 'json', version: '20200518' 
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
-	 // https://mvnrepository.com/artifact/joda-time/joda-time
+	implementation group: 'org.json', name: 'json', version: '20200518'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.1'
 	implementation group: 'joda-time', name: 'joda-time', version: '2.10.13'
 	
 	//SolrJ

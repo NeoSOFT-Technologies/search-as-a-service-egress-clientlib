@@ -14,7 +14,8 @@ public interface SearchServicePort {
 										String pageSize, 
 										String tag, 
 										String order,
-										Loggers loggersDTO);
+										Loggers loggersDTO,
+										String jwtToken);
 	
 	SearchResponse setUpSelectQuerySearchViaQuery(
 										int clientId, 
@@ -24,6 +25,7 @@ public interface SearchServicePort {
 										String pageSize, 
 										String orderBy, 
 										String order,
-										Loggers loggersDTO);
+										Loggers loggersDTO,
+										String jwtToken);
 	
 }

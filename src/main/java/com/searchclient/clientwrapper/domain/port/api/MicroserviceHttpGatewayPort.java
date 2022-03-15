@@ -5,6 +5,6 @@ import org.json.JSONObject;
 
 public interface MicroserviceHttpGatewayPort {
 		
-	public JSONObject getRequest();
+	public JSONObject getRequest(String jwtToken);
 	
 }

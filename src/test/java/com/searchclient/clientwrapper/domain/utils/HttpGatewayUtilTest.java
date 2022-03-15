@@ -52,7 +52,7 @@ class HttpGatewayUtilTest {
 		Mockito.when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
 		
 		int responseStatus = closeableHttpResponse.getStatusLine().getStatusCode();
-		JSONObject jsonObject = gatewayUtil.extracted(httpGet, closeableHttpClient);
+		JSONObject jsonObject = gatewayUtil.extracted(httpGet, closeableHttpClient, Mockito.anyString());
 		
 		assertEquals(responseStatus, jsonObject.get("statusCode"));
 	}

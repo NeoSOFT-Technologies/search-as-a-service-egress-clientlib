@@ -26,10 +26,10 @@ public class MicroserviceHttpGateway implements MicroserviceHttpGatewayPort {
     HttpGatewayUtil httpGatewayUtil = new HttpGatewayUtil();
 
 	@Override
-	public JSONObject getRequest() {
+	public JSONObject getRequest(String jwtToken) {
     	Map<String, Object> httpMap =  httpGatewayUtil.prepareHttpClient(apiEndpoint);
     	
-        return httpGatewayUtil.extracted((HttpGet)httpMap.get("httpGet"), (CloseableHttpClient)httpMap.get("httpClient"));
+        return httpGatewayUtil.extracted((HttpGet)httpMap.get("httpGet"), (CloseableHttpClient)httpMap.get("httpClient"), jwtToken);
 
 	}
 }
