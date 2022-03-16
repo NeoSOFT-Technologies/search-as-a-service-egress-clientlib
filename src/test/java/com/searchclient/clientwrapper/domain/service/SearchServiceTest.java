@@ -128,7 +128,8 @@ class SearchServiceTest {
 				searchTerm, 
 				startRecord, pageSize, 
 				orderBy, order, 
-				loggersDTO);
+				loggersDTO,
+				Mockito.anyString());
 	}
 	
 	public void setUpSearchViaQueryResponse() {
@@ -137,13 +138,14 @@ class SearchServiceTest {
 				searchQuery, 
 				startRecord, pageSize, 
 				orderBy, order, 
-				loggersDTO);
+				loggersDTO,
+				Mockito.anyString());
 	}
 	
 
 	public void setMockitoSuccessResponseForService() {
     	jsonObject = new JSONObject(successResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest()).thenReturn(jsonObject);
+    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
     	expectedResponse.setStatusCode(200);
@@ -153,7 +155,7 @@ class SearchServiceTest {
 	
 	public void setMockitoHalfSuccessResponseForService() {
     	jsonObject = new JSONObject(successResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest()).thenReturn(jsonObject);
+    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
     	expectedResponse.setStatusCode(406);
@@ -164,7 +166,7 @@ class SearchServiceTest {
 	public void setMockitoFailureResponseForService() {
 		failureResponseString = String.format(failureResponseString, apiEndpoint);
     	jsonObject = new JSONObject(failureResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest()).thenReturn(jsonObject);
+    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
     	expectedResponse.setStatusCode(400);

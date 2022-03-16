@@ -1,5 +1,6 @@
 package com.searchclient.clientwrapper.domain.dto;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class SearchResponse {
 
 	private int statusCode;
+	private HttpStatus status;
 	private String message;
 	private  Object solrDocuments;
 	
@@ -32,6 +34,14 @@ public class SearchResponse {
 	}
 	public void setSolrDocuments(Object solrDocuments) {
 		this.solrDocuments = solrDocuments;
+	}
+
+	public HttpStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(HttpStatus status) {
+		this.status = status;
 	}
 	
 }

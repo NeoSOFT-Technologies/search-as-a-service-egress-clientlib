@@ -5,10 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
+import com.searchclient.clientwrapper.domain.error.JwtAuthenticationFailureException;
+import com.searchclient.clientwrapper.domain.error.MicroserviceConnectionException;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
@@ -55,7 +58,8 @@ public class SearchService implements SearchServicePort {
     		String startRecord, 
     		String pageSize, 
     		String orderBy, String order, 
-    		Loggers loggersDTO) {
+    		Loggers loggersDTO,
+    		String jwtToken) {
         /* Egress API -- table records -- SEARCH VIA QUERY FIELD */
         logger.debug("Performing search-records VIA QUERY FIELD for given table");
         
@@ -84,34 +88,54 @@ public class SearchService implements SearchServicePort {
                 + "&orderBy=" + orderBy + "&order=" + order);
 
         try {
-            JSONObject jsonObject = microserviceHttpGateway.getRequest();
-
-            if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400) {
-            	searchResponse.setStatusCode(400);
-            	searchResponse.setMessage(
-            			String.format(
-            					QUERY_PROCESS_ERROR, 
-            					microserviceHttpGateway.getApiEndpoint()));
-            	searchResponse.setSolrDocuments(null);
-            } else {
-        		searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
-                searchResponse.setMessage(jsonObject.get("responseMessage").toString());
-                searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
+            JSONObject jsonObject = microserviceHttpGateway.getRequest(jwtToken);
+            searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
+            searchResponse.setMessage(jsonObject.get("message").toString());
+            if(200 == searchResponse.getStatusCode()) {
+            	searchResponse.setStatus(HttpStatus.OK);
+            	searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
+            }else if(406 == searchResponse.getStatusCode()){
+            	searchResponse.setStatus(HttpStatus.NOT_ACCEPTABLE);
+            }else {
+            	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
             }
-            logger.debug("completed service run");
             
+//            if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400 && jsonObject.get("message").toString().contains("Resource not found")) {
+//            	searchResponse.setMessage("Resource not found.");
+//            }else if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400) {
+//            	searchResponse.setMessage(
+//            			String.format(
+//            					QUERY_PROCESS_ERROR, 
+//            					microserviceHttpGateway.getApiEndpoint()));
+//            	searchResponse.setSolrDocuments(null);
+//            } else {
+//        		searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
+//              searchResponse.setMessage(jsonObject.get("message").toString());
+//              searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
+//            }
+            logger.debug("completed service run");
             loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
     		LoggerUtils.printlogger(loggersDTO,false,false);
             
         } catch (Exception e) {
         	logger.error("Exception occurred while performing getRequest operation via Http Gateway: {}", e.getMessage());
-        	searchResponse.setStatusCode(400);
-        	searchResponse.setMessage(
-        			String.format(
-        					QUERY_PROCESS_ERROR, 
-        					microserviceHttpGateway.getApiEndpoint()));
-        	searchResponse.setSolrDocuments(null);
-        	LoggerUtils.printlogger(loggersDTO,false,true);
+        	if(e instanceof JwtAuthenticationFailureException) {
+        		JwtAuthenticationFailureException ex = (JwtAuthenticationFailureException)e;
+        		searchResponse.setStatusCode(ex.getExceptionCode());
+        		searchResponse.setMessage(ex.getExceptionMessage());
+        		searchResponse.setStatus(ex.getStatus());
+        	}else if(e instanceof MicroserviceConnectionException) {
+        		MicroserviceConnectionException ex = (MicroserviceConnectionException)e;
+        		searchResponse.setStatusCode(ex.getExceptionCode());
+        		searchResponse.setMessage(ex.getExceptionMessage());
+        		searchResponse.setStatus(ex.getStatus());
+        	}else {
+        		searchResponse.setStatusCode(400);
+            	searchResponse.setMessage(String.format(QUERY_PROCESS_ERROR,microserviceHttpGateway.getApiEndpoint()));
+            	searchResponse.setSolrDocuments(null);
+            	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
+            	LoggerUtils.printlogger(loggersDTO,false,true);
+        	}
         }
 
         return searchResponse;
@@ -121,7 +145,7 @@ public class SearchService implements SearchServicePort {
 	public SearchResponse setUpSelectQuerySearchViaQuery(
 			int clientId, String tableName, 
 			String searchQuery, 
-			String startRecord, String pageSize, String orderBy, String order, Loggers loggersDTO) {
+			String startRecord, String pageSize, String orderBy, String order, Loggers loggersDTO, String jwtToken) {
         /* Egress API -- table records -- SEARCH VIA QUERY BUILDER */
         logger.debug("Performing search-records VIA QUERY BUILDER for given table");
         
@@ -140,37 +164,53 @@ public class SearchService implements SearchServicePort {
                 + "&orderBy=" + orderBy + "&order=" + order);
         
         try {
-            JSONObject jsonObject = microserviceHttpGateway.getRequest();
+            JSONObject jsonObject = microserviceHttpGateway.getRequest(jwtToken);
             
             // testing
-            logger.info("gateway >>>>>>> {}", microserviceHttpGateway.getRequest());
-            logger.info("gateway obj >>>>>>> {}", jsonObject.get(RESULTS));
+//            logger.info("gateway >>>>>>> {}", microserviceHttpGateway.getRequest(jwtToken));
+//            logger.info("gateway obj >>>>>>> {}", jsonObject.get(RESULTS));
             
-			searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
-			searchResponse.setMessage(jsonObject.get("responseMessage").toString());
-			if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) != 400)
-				searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
-			else
-				searchResponse.setSolrDocuments(jsonObject.get(null));
+            searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
+            searchResponse.setMessage(jsonObject.get("message").toString());
+            if(200 == searchResponse.getStatusCode()) {
+            	searchResponse.setStatus(HttpStatus.OK);
+            	searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
+            }else if(406 == searchResponse.getStatusCode()){
+            	searchResponse.setStatus(HttpStatus.NOT_ACCEPTABLE);
+            }else {
+            	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
+            }
+            
+//			if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) != 400)
+//				searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
+//			else
+//				searchResponse.setSolrDocuments(jsonObject.get(null));
             logger.debug("completed service run");
-            
             loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
     		LoggerUtils.printlogger(loggersDTO,false,false);
             
         } catch (Exception e) {
         	logger.error("Exception occurred while performing getRequest operation via Http Gateway: {}", e.getMessage());
-        	searchResponse.setStatusCode(400);
-        	searchResponse.setMessage(
-        			String.format(
-        					QUERY_PROCESS_ERROR, 
-        					microserviceHttpGateway.getApiEndpoint()));
-        	searchResponse.setSolrDocuments(null);
-        	LoggerUtils.printlogger(loggersDTO,false,true);
+        	if(e instanceof JwtAuthenticationFailureException) {
+        		JwtAuthenticationFailureException ex = (JwtAuthenticationFailureException)e;
+        		searchResponse.setStatusCode(ex.getExceptionCode());
+        		searchResponse.setMessage(ex.getExceptionMessage());
+        		searchResponse.setStatus(ex.getStatus());
+        	}else if(e instanceof MicroserviceConnectionException) {
+        		MicroserviceConnectionException ex = (MicroserviceConnectionException)e;
+        		searchResponse.setStatusCode(ex.getExceptionCode());
+        		searchResponse.setMessage(ex.getExceptionMessage());
+        		searchResponse.setStatus(ex.getStatus());
+        	}else {
+        		searchResponse.setStatusCode(400);
+            	searchResponse.setMessage(String.format(QUERY_PROCESS_ERROR,microserviceHttpGateway.getApiEndpoint()));
+            	searchResponse.setSolrDocuments(null);
+            	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
+	        	LoggerUtils.printlogger(loggersDTO,false,true);
+        	}
         }
-        
         // testing
         logger.info("searchResponse ######## {}", searchResponse);
-
         return searchResponse;
 	}
 
