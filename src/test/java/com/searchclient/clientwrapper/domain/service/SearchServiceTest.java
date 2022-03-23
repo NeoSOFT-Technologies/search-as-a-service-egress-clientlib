@@ -128,7 +128,7 @@ class SearchServiceTest {
 				searchTerm, 
 				startRecord, pageSize, 
 				orderBy, order, 
-				loggersDTO,
+				
 				Mockito.anyString());
 	}
 	
@@ -138,7 +138,6 @@ class SearchServiceTest {
 				searchQuery, 
 				startRecord, pageSize, 
 				orderBy, order, 
-				loggersDTO,
 				Mockito.anyString());
 	}
 	
