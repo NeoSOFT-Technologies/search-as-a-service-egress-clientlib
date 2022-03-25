@@ -43,14 +43,7 @@ public class SearchService implements SearchServicePort {
 
     Loggers loggersDTO= new Loggers();
     
-//    private void requestMethod(Loggers loggersDTO, String nameofCurrMethod) {
-//
-//		String timestamp = LoggerUtils.utcTime().toString();
-//		loggersDTO.setNameofmethod(nameofCurrMethod);
-//		loggersDTO.setTimestamp(timestamp);
-//		loggersDTO.setServicename(servicename);
-//		loggersDTO.setUsername(username);
-//	}
+
     
     @Override
     public SearchResponse setUpSelectQuerySearchViaQueryField(
@@ -65,7 +58,7 @@ public class SearchService implements SearchServicePort {
         logger.debug("Performing search-records VIA QUERY FIELD for given table");
     	String timestamp = LoggerUtils.utcTime().toString();
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-     //   requestMethod(loggersDTO, nameofCurrMethod);
+
         
     	loggersDTO = LoggerUtils.getRequestLoggingInfo(username, servicename, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);	
@@ -153,7 +146,7 @@ public class SearchService implements SearchServicePort {
         logger.debug("Performing search-records VIA QUERY BUILDER for given table");
     	String timestamp = LoggerUtils.utcTime().toString();
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		//requestMethod(loggersDTO,nameofCurrMethod);
+
     	loggersDTO = LoggerUtils.getRequestLoggingInfo(username, servicename, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
