@@ -1,7 +1,6 @@
 package com.searchclient.clientwrapper.domain.port.api;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
-import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 
 public interface SearchServicePort {
 		
@@ -14,7 +13,6 @@ public interface SearchServicePort {
 										String pageSize, 
 										String tag, 
 										String order,
-										Loggers loggersDTO,
 										String jwtToken);
 	
 	SearchResponse setUpSelectQuerySearchViaQuery(
@@ -25,7 +23,6 @@ public interface SearchServicePort {
 										String pageSize, 
 										String orderBy, 
 										String order,
-										Loggers loggersDTO,
 										String jwtToken);
 	
 }
