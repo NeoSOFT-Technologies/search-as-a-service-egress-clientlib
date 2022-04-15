@@ -15,8 +15,10 @@ public class SearchResponse {
 	private  Object solrDocuments;
 	
 	
-	public SearchResponse() {}
-	
+	public SearchResponse() {
+		//Default Constructor
+	}
+	 
 	public int getStatusCode() {
 		return statusCode;
 	}
