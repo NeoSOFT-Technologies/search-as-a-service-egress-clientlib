@@ -25,7 +25,7 @@ public class HttpGatewayUtil {
     private static final String CONTENT_TYPE = "Content-type";
 	private static final String ACCEPT = "Accept";
 	private static final String APPLICATION_JSON = "application/json";
-	
+	private static final String UNAUTHORIZED = "Unauthorized";
 	private final Logger log = LoggerFactory.getLogger(HttpGatewayUtil.class);
 	
 	public JSONObject extracted(HttpGet http, CloseableHttpClient client, String jwtToken) {
@@ -63,11 +63,6 @@ public class HttpGatewayUtil {
     public Map<String, Object> prepareHttpClient(String apiEndpoint) {
 		HttpGet http = new HttpGet(apiEndpoint);
 		CloseableHttpClient client = HttpClients.createDefault();
-		
-		System.out.println("Inside prepHttpCl #####");
-		System.out.println("httpGet @@@@@ "+http);
-		System.out.println("httpClient @@@@@ "+client);
-		
 		Map<String, Object> map = new HashMap<>();
 		map.put("httpGet", http);
 		map.put("httpClient", client);
@@ -77,8 +72,8 @@ public class HttpGatewayUtil {
     
     public void isJwtAuthenticationError(String jsonString) {
     	JSONObject obj = new JSONObject(jsonString);
-    	if((obj.has("Unauthorized"))?obj.getString("Unauthorized").contains("Invalid token"):false)
-    		throw new JwtAuthenticationFailureException(HttpStatus.SC_FORBIDDEN,obj.getString("Unauthorized"),org.springframework.http.HttpStatus.UNAUTHORIZED);
+    	if((obj.has(UNAUTHORIZED))?obj.getString(UNAUTHORIZED).contains("Invalid token"):false)
+    		throw new JwtAuthenticationFailureException(HttpStatus.SC_FORBIDDEN,obj.getString(UNAUTHORIZED),org.springframework.http.HttpStatus.UNAUTHORIZED);
     }
     
     private void handleException(Exception exception) {

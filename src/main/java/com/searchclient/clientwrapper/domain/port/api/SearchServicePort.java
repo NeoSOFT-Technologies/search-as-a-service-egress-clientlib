@@ -5,7 +5,7 @@ import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 public interface SearchServicePort {
 		
 	SearchResponse setUpSelectQuerySearchViaQueryField(
-										int clientId, 
+										int tenantId, 
 										String collection, 
 										String queryField, 
 										String searchTerm, 
@@ -16,7 +16,7 @@ public interface SearchServicePort {
 										String jwtToken);
 	
 	SearchResponse setUpSelectQuerySearchViaQuery(
-										int clientId, 
+			                            int tenantId, 
 										String tableName, 
 										String searchQuery, 
 										String startRecord, 

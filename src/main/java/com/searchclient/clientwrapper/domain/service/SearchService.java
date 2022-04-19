@@ -42,12 +42,10 @@ public class SearchService implements SearchServicePort {
     MicroserviceHttpGateway microserviceHttpGateway;
 
     Loggers loggersDTO= new Loggers();
-    
-
-    
+   
     @Override
     public SearchResponse setUpSelectQuerySearchViaQueryField(
-    		int clientId, 
+    		int tenantId, 
     		String tableName, 
     		String queryField, String searchTerm, 
     		String startRecord, 
@@ -76,9 +74,9 @@ public class SearchService implements SearchServicePort {
 					
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
-        		+ "/" + clientId
         		+ "/" + tableName
-        		+ "?queryField=" + queryField + "&searchTerm=" + searchTerm
+        		+ "?tenantId="+tenantId
+        		+ "&queryField=" + queryField + "&searchTerm=" + searchTerm
         		+ "&startRecord=" + startRecord
                 + "&pageSize=" + pageSize
                 + "&orderBy=" + orderBy + "&order=" + order);
@@ -139,7 +137,7 @@ public class SearchService implements SearchServicePort {
 
 	@Override
 	public SearchResponse setUpSelectQuerySearchViaQuery(
-			int clientId, String tableName, 
+			int tenantId, String tableName, 
 			String searchQuery, 
 			String startRecord, String pageSize, String orderBy, String order, String jwtToken) {
         /* Egress API -- table records -- SEARCH VIA QUERY BUILDER */
@@ -153,9 +151,9 @@ public class SearchService implements SearchServicePort {
 		apiEndpoint = "/query";
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
-        		+ "/" + clientId
         		+ "/" + tableName
-        		+ "?searchQuery=" + searchQuery
+        		+ "?tenantId=" + tenantId
+        		+ "&searchQuery=" + searchQuery
         		+ "&startRecord=" + startRecord
                 + "&pageSize=" + pageSize
                 + "&orderBy=" + orderBy + "&order=" + order);
