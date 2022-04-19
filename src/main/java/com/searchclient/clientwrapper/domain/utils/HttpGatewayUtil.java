@@ -63,11 +63,6 @@ public class HttpGatewayUtil {
     public Map<String, Object> prepareHttpClient(String apiEndpoint) {
 		HttpGet http = new HttpGet(apiEndpoint);
 		CloseableHttpClient client = HttpClients.createDefault();
-		
-		log.debug("Inside prepHttpCl #####");
-		log.debug("httpGet @@@@@ :{}",http);
-		log.debug("httpClient @@@@@ : {}",client);
-		
 		Map<String, Object> map = new HashMap<>();
 		map.put("httpGet", http);
 		map.put("httpClient", client);
