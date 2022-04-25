@@ -56,11 +56,12 @@ public class SearchService implements SearchServicePort {
         logger.debug("Performing search-records VIA QUERY FIELD for given table");
     	String timestamp = LoggerUtils.utcTime().toString();
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-
+        
+        
         
     	loggersDTO = LoggerUtils.getRequestLoggingInfo(username, servicename, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);	
-
+		
 		// Perform Validations on input data
 		// VALIDATE queryField
 		boolean isQueryFieldValidated = SearchUtil.checkIfNameIsAlphaNumeric(queryField.trim());
@@ -71,7 +72,11 @@ public class SearchService implements SearchServicePort {
 			searchResponse.setSolrDocuments(null);
 			return searchResponse;
 		}
-					
+		
+//		space in between search term words replaces with '+'	
+		searchTerm = searchTerm.replace(" ","+");
+		
+		
         microserviceHttpGateway.setApiEndpoint(
         		baseMicroserviceUrl + microserviceVersion + apiEndpoint
         		+ "/" + tableName
@@ -147,6 +152,8 @@ public class SearchService implements SearchServicePort {
 
     	loggersDTO = LoggerUtils.getRequestLoggingInfo(username, servicename, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		searchQuery = searchQuery.replaceAll(" ","+");
 		
 		apiEndpoint = "/query";
         microserviceHttpGateway.setApiEndpoint(
