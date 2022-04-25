@@ -153,7 +153,7 @@ public class SearchService implements SearchServicePort {
     	loggersDTO = LoggerUtils.getRequestLoggingInfo(username, servicename, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
-		searchQuery = searchQuery.replace(" ","+");
+		searchQuery = searchQuery.replaceAll(" ","+");
 		
 		apiEndpoint = "/query";
         microserviceHttpGateway.setApiEndpoint(
