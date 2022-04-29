@@ -4,20 +4,55 @@ plugins {
 	id 'java'
 	id 'jacoco'
 	id "org.sonarqube" version '2.8'
-	
+	id 'maven-publish'
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
+group = 'com.searchservice.ingress.lib'
+//SNAPSHOT-REPO-VERSION
+//version = '0.0.1-SNAPSHOT'
+
+//RELEASE-REPO-VERSION 
+version = '0.0.1-RELEASE'
+
+//MIXED-VERSION 
+//version = '0.0.1-MIXED'
+
 sourceCompatibility = '11'
 apply from: "gradle/sonar.gradle"
+//apply plugin: 'maven-publish'
 
-repositories {
-	mavenCentral()
-	//// create FAT jar ////
-    jcenter()
+//======NEXUS CONFIGURATION=========
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+        	//SNAPSHOT-REPO
+        	//version = '1.0-SNAPSHOT'
+        	
+        	//RELEASE-REPO
+        	version = '1.0-RELEASE'
+        	
+        	
+            artifact("/libs/saas-egress-clientlib-fat-0.0.1.jar"){
+                extension 'jar'
+            }
+        }
+    }
+    repositories {
+	    maven {
+			name 'nexus'
+			url 'http://localhost:8081/repository/nexus-client-egress-release/'
+			//url 'http://localhost:8081/repository/nexus-client-egress-snapshot/'
+			//url 'http://localhost:8081/repository/nexus-client-egress-public-group/'
+			allowInsecureProtocol = true
+			credentials {
+				username project.nexusUsername
+				password project.nexusPassword
+			}
+		}
+	}
 }
-
 dependencyManagement {
 	imports {
 		mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
@@ -94,4 +129,11 @@ dependencies {
 	//SolrJ
 	implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
 	
+}
+repositories {
+	mavenCentral()
+	jcenter()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
 }
