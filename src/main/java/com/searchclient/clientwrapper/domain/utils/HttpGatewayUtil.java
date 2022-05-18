@@ -49,14 +49,9 @@ public class HttpGatewayUtil {
         	handleException(e);
             log.error(e.toString());
             return new JSONObject(result);
-            //result = "{\"statusCode\":\"400\"}";
         }
         isJwtAuthenticationError(result);
         return new JSONObject(result);
-//        if(response != null)
-//        	jsonObject.put("statusCode", response.getStatusLine().getStatusCode());
-//        
-//        return jsonObject;
 	}
 	
 	
