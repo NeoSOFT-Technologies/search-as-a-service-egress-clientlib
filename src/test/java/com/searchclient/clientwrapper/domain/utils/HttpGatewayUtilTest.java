@@ -47,14 +47,14 @@ class HttpGatewayUtilTest {
 		CloseableHttpClient closeableHttpClient = mock(CloseableHttpClient.class);
 		CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
 		StatusLine statusLine = mock(StatusLine.class);
-		Mockito.when(statusLine.getStatusCode()).thenReturn(200);
+		Mockito.when(statusLine.getStatusCode()).thenReturn(0);
 		Mockito.when(closeableHttpResponse.getStatusLine()).thenReturn(statusLine);
 		Mockito.when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
 		
 		int responseStatus = closeableHttpResponse.getStatusLine().getStatusCode();
-		JSONObject jsonObject = gatewayUtil.extracted(httpGet, closeableHttpClient, Mockito.anyString());
-		
-		assertEquals(responseStatus, jsonObject.get("statusCode"));
+		JSONObject jsonObject = gatewayUtil.extracted(httpGet, closeableHttpClient, "Bearer Testing");
+		System.out.println(">>> "+jsonObject);
+		assertEquals(responseStatus, Integer.parseInt((String) jsonObject.get("statusCode")));
 	}
 
 
