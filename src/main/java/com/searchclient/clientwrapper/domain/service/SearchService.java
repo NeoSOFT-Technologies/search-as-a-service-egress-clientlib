@@ -98,20 +98,6 @@ public class SearchService implements SearchServicePort {
             }else {
             	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
             }
-            
-//            if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400 && jsonObject.get("message").toString().contains("Resource not found")) {
-//            	searchResponse.setMessage("Resource not found.");
-//            }else if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) == 400) {
-//            	searchResponse.setMessage(
-//            			String.format(
-//            					QUERY_PROCESS_ERROR, 
-//            					microserviceHttpGateway.getApiEndpoint()));
-//            	searchResponse.setSolrDocuments(null);
-//            } else {
-//        		searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
-//              searchResponse.setMessage(jsonObject.get("message").toString());
-//              searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
-//            }
             logger.debug("completed service run");
             loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
     		LoggerUtils.printlogger(loggersDTO,false,false);
@@ -166,12 +152,7 @@ public class SearchService implements SearchServicePort {
                 + "&orderBy=" + orderBy + "&order=" + order);
         
         try {
-            JSONObject jsonObject = microserviceHttpGateway.getRequest(jwtToken);
-            
-            // testing
-//            logger.info("gateway >>>>>>> {}", microserviceHttpGateway.getRequest(jwtToken));
-//            logger.info("gateway obj >>>>>>> {}", jsonObject.get(RESULTS));
-            
+            JSONObject jsonObject = microserviceHttpGateway.getRequest(jwtToken); 
             searchResponse.setStatusCode(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()));
             searchResponse.setMessage(jsonObject.get("message").toString());
             if(200 == searchResponse.getStatusCode()) {
@@ -182,11 +163,6 @@ public class SearchService implements SearchServicePort {
             }else {
             	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
             }
-            
-//			if(Integer.parseInt(jsonObject.get(STATUS_CODE).toString()) != 400)
-//				searchResponse.setSolrDocuments(jsonObject.get(RESULTS));
-//			else
-//				searchResponse.setSolrDocuments(jsonObject.get(null));
             logger.debug("completed service run");
             loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
     		LoggerUtils.printlogger(loggersDTO,false,false);
@@ -211,7 +187,7 @@ public class SearchService implements SearchServicePort {
 	        	LoggerUtils.printlogger(loggersDTO,false,true);
         	}
         }
-        // testing
+      
         logger.info("searchResponse ######## {}", searchResponse);
         return searchResponse;
 	}
