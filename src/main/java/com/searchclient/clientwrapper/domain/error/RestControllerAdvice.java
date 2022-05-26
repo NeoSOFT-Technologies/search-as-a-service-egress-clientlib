@@ -10,82 +10,49 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestControllerAdvice {
 
 	  private final Logger log = LoggerFactory.getLogger(RestControllerAdvice.class);
-	  
-	@ExceptionHandler(BadRequestOccurredException.class)
-	public ResponseEntity<RestApiError> handleBadRequestOccurred(
-			BadRequestOccurredException exception) {
-		return frameRestApiException(new RestApiError(
-										HttpStatus.BAD_REQUEST, 
-										exception.getExceptionMessage()));
-	}
 	
-	@ExceptionHandler(ContentNotFoundException.class)
-	public ResponseEntity<RestApiError> handleRestApiDefaultException(
-			ContentNotFoundException exception) {
-		return frameRestApiException(new RestApiError(
-										HttpStatus.NOT_FOUND, 
-										exception.getExceptionMessage()));
-	}
-	
-	@ExceptionHandler(NullPointerOccurredException.class)
-	public ResponseEntity<RestApiError> handleNullPointerOccurredException(
-			NullPointerOccurredException exception) {
-		return frameRestApiException(new RestApiError(
-										HttpStatus.NOT_FOUND, 
-										exception.getExceptionMessage()));
-	}
+	  @ExceptionHandler(CustomException.class)
+		public ResponseEntity<Object> handleGenericException(CustomException exception) {
 
+			return new ResponseEntity<>(new RestApiErrorHandling(
+					exception.getExceptionCode(), exception.getStatus(),
+					exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+		}
+	  
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<RestApiError> handleUncaughtException(
+	public ResponseEntity<Object> handleUncaughtException(
 			Exception exception) {
 		log.error("Uncaught Error Occured: {}", exception.getMessage());
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getMessage()));
-	}
-	
-	
-	@ExceptionHandler(InputDocumentException.class)
-	public ResponseEntity<RestApiError> handleInputDocumentExcpetion(InputDocumentException exception){
 		return frameRestApiException(new RestApiError(
-				HttpStatus.BAD_REQUEST, 
-				exception.getExceptionMessage()));
-	}
-	
-	@ExceptionHandler(SchemaResourceException.class)
-	public ResponseEntity<RestApiError> handleSchemaResourceExcpetion(SchemaResourceException exception){
-		return frameRestApiException(new RestApiError(
-				HttpStatus.BAD_REQUEST, 
-				exception.getExceptionMessage()));
-	}
-	
-	@ExceptionHandler(TableResourceException.class)
-	public ResponseEntity<RestApiError> handleTableResourceExcpetion(TableResourceException exception){
-		return frameRestApiException(new RestApiError(
-				HttpStatus.BAD_REQUEST, 
-				exception.getExceptionMessage()));
+										HttpStatusCode.BAD_REQUEST_EXCEPTION,HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
+										"Uncaught error occurred. "+exception.getMessage()));
 	}
 	
 	
-	private ResponseEntity<RestApiError> frameRestApiException(RestApiError err) {
+	private ResponseEntity<Object> frameRestApiException(RestApiError err) {
 		return new ResponseEntity<>(err, err.getStatus());
 	}
 	
+	
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<RestApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception){
+	public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception){
 		String fieldName = "";
 		if(exception.getCause() instanceof UnrecognizedPropertyException) {
 			UnrecognizedPropertyException ex = (UnrecognizedPropertyException)exception.getCause();
 			fieldName = ex.getPropertyName();
-			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Unrecognized Field : "+fieldName));
+			return new ResponseEntity<>(new RestApiErrorHandling(
+					HttpStatusCode.UNRECOGNIZED_FIELD.getCode(), HttpStatusCode.UNRECOGNIZED_FIELD,
+					String.format(HttpStatusCode.UNRECOGNIZED_FIELD.getMessage(), fieldName)), HttpStatus.BAD_REQUEST);
 		}else if(exception.getCause() instanceof InvalidFormatException) {
 			InvalidFormatException ex = (InvalidFormatException)exception.getCause();
 			if (ex.getPath() != null && !ex.getPath().isEmpty()) {
@@ -93,21 +60,27 @@ public class RestControllerAdvice {
 		       fieldName = (null != path)?path.getFieldName():"";
 		    }
 			String value = (null != ex.getValue())?ex.getValue().toString():"";
-			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field : "+fieldName+" is not expected as : "+value));
+			return new ResponseEntity<>(new RestApiErrorHandling(
+					HttpStatusCode.INVALID_FIELD_VALUE.getCode(), HttpStatusCode.INVALID_FIELD_VALUE,
+					String.format(HttpStatusCode.INVALID_FIELD_VALUE.getMessage(), fieldName, value)), HttpStatus.BAD_REQUEST);
+		
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
-			if(ex.getCause() instanceof BadRequestOccurredException) {
-				BadRequestOccurredException exc = (BadRequestOccurredException)ex.getCause();
-				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
+			if(ex.getCause() instanceof CustomException) {
+				CustomException exc = (CustomException)ex.getCause();
+				return frameRestApiException(new RestApiError(exc.getStatus(),exc.getExceptionCode(), exc.getExceptionMessage()));
 			}else
-				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Provide valid JSON Input"));
+				return frameRestApiException(new RestApiError(HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+						HttpStatusCode.INVALID_JSON_INPUT.getMessage()));
 		}else {
-			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Provide valid JSON Input"));
+			return frameRestApiException(new RestApiError(HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT.getMessage()));
 		}
+		
 	}
 	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public ResponseEntity<RestApiError> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception){
+	public ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception){
 		String fieldName = "";
 		String requiredType = "";
 		if(exception.getCause() instanceof NumberFormatException) {
@@ -121,18 +94,19 @@ public class RestControllerAdvice {
 					log.error("Something Went Wrong!" , e);
 				}
 			}
-			return frameRestApiException(
-					new RestApiError(HttpStatus.BAD_REQUEST, fieldName + " must be of type " + requiredType));
+		return new ResponseEntity<>(new RestApiErrorHandling(
+			HttpStatusCode.INVALID_TYPE.getCode(), HttpStatusCode.INVALID_TYPE,
+				String.format(HttpStatusCode.INVALID_TYPE.getMessage(), fieldName, requiredType)), HttpStatus.BAD_REQUEST);
 		}
 	
 	
 	@ExceptionHandler(MicroserviceConnectionException.class)
-	public ResponseEntity<RestApiError> handleMicroserviceConnectionException(MicroserviceConnectionException exception){
+	public ResponseEntity<Object> handleMicroserviceConnectionException(MicroserviceConnectionException exception){
 		return frameRestApiException(new RestApiError(HttpStatus.SERVICE_UNAVAILABLE, exception.getExceptionMessage()));
 	}
 	
 	@ExceptionHandler(JwtAuthenticationFailureException.class)
-	public ResponseEntity<RestApiError> handleJwtAuthenticationFailureException(JwtAuthenticationFailureException exception){
+	public ResponseEntity<Object> handleJwtAuthenticationFailureException(JwtAuthenticationFailureException exception){
 		return frameRestApiException(new RestApiError(HttpStatus.FORBIDDEN, exception.getExceptionMessage()));
 	}
 }

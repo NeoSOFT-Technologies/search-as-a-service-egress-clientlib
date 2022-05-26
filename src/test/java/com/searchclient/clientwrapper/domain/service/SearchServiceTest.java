@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
 import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
+import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 
@@ -157,7 +158,7 @@ class SearchServiceTest {
     	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(406);
+    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FIELD.getCode());
     	expectedResponse.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
     	expectedResponse.setSolrDocuments(null);
 	}
@@ -168,7 +169,7 @@ class SearchServiceTest {
     	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(400);
+    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
     	expectedResponse.setMessage(
     			String.format(
     					QUERY_PROCESS_ERROR, 
@@ -182,7 +183,7 @@ class SearchServiceTest {
     	//Mockito.when(microserviceHttpGateway.getRequest()).thenReturn(jsonObject);
 		
 		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(400);
+    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
     	expectedResponse.setMessage(
     			String.format(
     					QUERY_PROCESS_ERROR, 

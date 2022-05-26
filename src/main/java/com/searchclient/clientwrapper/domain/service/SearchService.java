@@ -13,6 +13,7 @@ import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 import com.searchclient.clientwrapper.domain.error.JwtAuthenticationFailureException;
 import com.searchclient.clientwrapper.domain.error.MicroserviceConnectionException;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
+import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 import com.searchclient.clientwrapper.domain.utils.LoggerUtils;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
@@ -67,7 +68,7 @@ public class SearchService implements SearchServicePort {
 		boolean isQueryFieldValidated = SearchUtil.checkIfNameIsAlphaNumeric(queryField.trim());
 
 		if(!isQueryFieldValidated) {
-			searchResponse.setStatusCode(406);
+			searchResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FIELD.getCode());
 			searchResponse.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
 			searchResponse.setSolrDocuments(null);
 			return searchResponse;
@@ -115,7 +116,7 @@ public class SearchService implements SearchServicePort {
         		searchResponse.setMessage(ex.getExceptionMessage());
         		searchResponse.setStatus(ex.getStatus());
         	}else {
-        		searchResponse.setStatusCode(400);
+        		searchResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
             	searchResponse.setMessage(String.format(QUERY_PROCESS_ERROR,microserviceHttpGateway.getApiEndpoint()));
             	searchResponse.setSolrDocuments(null);
             	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
@@ -180,7 +181,7 @@ public class SearchService implements SearchServicePort {
         		searchResponse.setMessage(ex.getExceptionMessage());
         		searchResponse.setStatus(ex.getStatus());
         	}else {
-        		searchResponse.setStatusCode(400);
+        		searchResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
             	searchResponse.setMessage(String.format(QUERY_PROCESS_ERROR,microserviceHttpGateway.getApiEndpoint()));
             	searchResponse.setSolrDocuments(null);
             	searchResponse.setStatus(HttpStatus.BAD_REQUEST);
