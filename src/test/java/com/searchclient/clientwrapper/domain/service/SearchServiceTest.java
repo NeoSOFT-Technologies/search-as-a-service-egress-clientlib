@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
-import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
@@ -51,7 +49,6 @@ class SearchServiceTest {
 	String pageSize = "10";
 	String orderBy = "id";
 	String order = "asc";
-	Loggers loggersDTO = new Loggers();
 	
 	@Value("${microservice.base-url}")
 	private String baseMicroserviceUrl;
