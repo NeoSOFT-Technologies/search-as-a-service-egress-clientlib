@@ -1,12 +1,19 @@
 package com.searchclient.clientwrapper.domain.utils;
 
 public enum HttpStatusCode {
-
 	INVALID_JSON_INPUT(105,"invalid json input or json format"),
 
 	INVALID_TYPE(115, "{} must be of type {}"),
 	
 	INVALID_FIELD_VALUE(116, "Value for field : {} is not expected as : {}"),
+	
+    TABLE_NOT_FOUND(108, "does not exist"),
+    
+    NULL_POINTER_EXCEPTION(404,"Received Null response"),
+   
+    OPERATION_NOT_ALLOWED(406 , "Operation Not Allowed!."),
+    
+    REQUEST_FORBIDDEN(403, "requested resource is forbidden"),
 	
 	UNRECOGNIZED_FIELD(106,"Unrecognized Field : {}"),
 	
@@ -16,7 +23,16 @@ public enum HttpStatusCode {
 	
 	UNDER_DELETION_PROCESS(107,"under deletion process"),
 	
-	INVALID_QUERY_FIELD(118, "Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
+	INVALID_QUERY_FIELD(118, "Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format"),
+	
+	REQUEST_FORBIDEN(403, "Request Unable To Authorize"),
+	
+	OK(200, "Request Sent Successfully"),
+	
+	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable"),
+	
+	SERVER_UNAVAILABLE(503,"Unable to Connect To the Server");
+	
 	
 	private int code;
 	private String message;

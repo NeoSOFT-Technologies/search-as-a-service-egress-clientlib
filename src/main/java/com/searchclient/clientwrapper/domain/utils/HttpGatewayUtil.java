@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.HttpHostConnectException;
@@ -16,9 +15,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.searchclient.clientwrapper.domain.error.JwtAuthenticationFailureException;
-import com.searchclient.clientwrapper.domain.error.MicroserviceConnectionException;
+import com.searchclient.clientwrapper.domain.error.CustomException;
 
 @Service
 public class HttpGatewayUtil {
@@ -67,18 +64,21 @@ public class HttpGatewayUtil {
     
     public void isJwtAuthenticationError(String jsonString) {
     	JSONObject obj = new JSONObject(jsonString);
-    	if((obj.has(UNAUTHORIZED))?obj.getString(UNAUTHORIZED).contains("Invalid token"):false)
-    		throw new JwtAuthenticationFailureException(HttpStatus.SC_FORBIDDEN,obj.getString(UNAUTHORIZED),org.springframework.http.HttpStatus.UNAUTHORIZED);
+    	if((obj.has(UNAUTHORIZED))&&obj.getString(UNAUTHORIZED).contains("Invalid token"))
+    		throw new CustomException(HttpStatusCode.REQUEST_FORBIDEN.getCode(), 
+    				HttpStatusCode.REQUEST_FORBIDEN, "Invalid token");
     }
     
     private void handleException(Exception exception) {
 		if(exception instanceof HttpHostConnectException) {
-			throw new MicroserviceConnectionException(HttpStatus.SC_SERVICE_UNAVAILABLE,"Unable to connect Microservice",org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE);
+			throw new CustomException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),
+					HttpStatusCode.SERVER_UNAVAILABLE,"Unable to connect Microservice");
 		}
 	}
     
     public void isTokenNullOrValid(String jwtToken) {
-    	if((null == jwtToken || jwtToken.isEmpty() || jwtToken.isBlank() || !jwtToken.startsWith("Bearer "))?true:false)
-    		throw new JwtAuthenticationFailureException(HttpStatus.SC_FORBIDDEN,"Provide valid token",org.springframework.http.HttpStatus.UNAUTHORIZED);
+    	if((null == jwtToken || jwtToken.isEmpty() || jwtToken.isBlank() || !jwtToken.startsWith("Bearer ")))
+    		throw new CustomException(HttpStatusCode.REQUEST_FORBIDEN.getCode(), 
+    				HttpStatusCode.REQUEST_FORBIDEN, "Provide valid token");
     }
 }

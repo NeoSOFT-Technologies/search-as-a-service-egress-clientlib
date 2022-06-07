@@ -4,13 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 
 @Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchResponse {
 
 	private int statusCode;
-	private HttpStatus status;
+	private HttpStatusCode status;
 	private String message;
 	private  Object solrDocuments;
 	
@@ -38,12 +39,13 @@ public class SearchResponse {
 		this.solrDocuments = solrDocuments;
 	}
 
-	public HttpStatus getStatus() {
+	public HttpStatusCode getStatus() {
 		return status;
 	}
 
-	public void setStatus(HttpStatus status) {
+	public void setStatus(HttpStatusCode status) {
 		this.status = status;
 	}
+
 	
 }

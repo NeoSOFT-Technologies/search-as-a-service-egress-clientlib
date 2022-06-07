@@ -99,14 +99,4 @@ public class RestControllerAdvice {
 				String.format(HttpStatusCode.INVALID_TYPE.getMessage(), fieldName, requiredType)), HttpStatus.BAD_REQUEST);
 		}
 	
-	
-	@ExceptionHandler(MicroserviceConnectionException.class)
-	public ResponseEntity<Object> handleMicroserviceConnectionException(MicroserviceConnectionException exception){
-		return frameRestApiException(new RestApiError(HttpStatus.SERVICE_UNAVAILABLE, exception.getExceptionMessage()));
-	}
-	
-	@ExceptionHandler(JwtAuthenticationFailureException.class)
-	public ResponseEntity<Object> handleJwtAuthenticationFailureException(JwtAuthenticationFailureException exception){
-		return frameRestApiException(new RestApiError(HttpStatus.FORBIDDEN, exception.getExceptionMessage()));
-	}
 }
