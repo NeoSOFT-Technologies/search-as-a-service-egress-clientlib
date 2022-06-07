@@ -1,8 +1,6 @@
 package com.searchclient.clientwrapper.domain.dto;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 
