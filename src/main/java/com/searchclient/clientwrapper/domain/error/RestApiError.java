@@ -1,18 +1,16 @@
 package com.searchclient.clientwrapper.domain.error;
 
 import java.time.LocalDateTime;
-
-
 import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 import lombok.Data;
 
 @Data
 public class RestApiError {
-       private int statusCode;
-	   private HttpStatus status;
+	  private HttpStatus status;
+	   private HttpStatusCode httpStatus;
+	   private int statusCode;
 	   private String message;
 	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	   private LocalDateTime timestamp;
@@ -20,25 +18,40 @@ public class RestApiError {
 	   private RestApiError() {
 	       timestamp = LocalDateTime.now();
 	   }
-
-	   RestApiError(HttpStatus status,int statusCode) {
+     static RestApiError getInstance() {
+   	  return new RestApiError();
+     }
+	   RestApiError(HttpStatus status) {
 	       this();
-	       this.statusCode=statusCode;
-	       this.status=status;
+	       this.status = status;
 	       this.message = "Unexpected Exception";
 	   }
 	   
-	   RestApiError(HttpStatus status, String message) {
+	   
+	   
+	   RestApiError(HttpStatus status, int statusCode, String message) {
 	       this();
-           this.statusCode=status.value();
-           this.status=status;
+	       this.status = status;
 	       this.message = message;
+	       this.statusCode = statusCode;
+	   }
+	   
+	   RestApiError(HttpStatusCode httpStatus, int statusCode, String message) {
+	       this();
+	       this.httpStatus = httpStatus;
+	       this.message = message;
+	       this.statusCode = statusCode;
 	   }
 
 	   RestApiError(HttpStatus status, Throwable ex) {
 	       this();
-           this.statusCode=status.value();
-           this.status=status;
+	       this.status = status;
 	       this.message = ex.getLocalizedMessage();
 	   }
-	}
+	   
+	   RestApiError(HttpStatus status, String message) {
+	       this();
+	       this.status = status;
+	       this.message = message;
+	   }
+}
