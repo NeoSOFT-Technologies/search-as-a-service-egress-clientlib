@@ -1,12 +1,8 @@
 package com.searchclient.clientwrapper.domain.service;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
+import com.searchclient.clientwrapper.domain.error.CustomException;
 import com.searchclient.clientwrapper.domain.utils.HttpStatusCode;
 import com.searchclient.clientwrapper.domain.utils.MicroserviceHttpGateway;
 import com.searchclient.clientwrapper.domain.utils.SearchUtil;
@@ -33,12 +30,11 @@ import com.searchclient.clientwrapper.domain.utils.SearchUtil;
 class SearchServiceTest {
 
 	private static final String TEST_PASSED = "Test passed";
-	private static final String QUERY_PROCESS_ERROR = "Could not execute query to fetch records. URL: %s";
 	
 	Logger logger = LoggerFactory.getLogger(SearchServiceTest.class);
 	
 	// Parameters required for service methods
-	int clientId = 101;
+	int tenantId = 101;
 	String tableName = "testtable";
 	
 	String searchQuery = "custom_query";
@@ -66,12 +62,10 @@ class SearchServiceTest {
 	SearchService searchService;
 
 	private JSONObject jsonObject;
-	private SearchResponse expectedResponse;
-	private SearchResponse receivedResponse;
 	private String successResponseString = 
 			"{\r\n"
 			+ "\"statusCode\":200,\r\n"
-			+ "\"responseMessage\":\""+TEST_PASSED+"\",\r\n"
+			+ "\"message\":\""+TEST_PASSED+"\",\r\n"
 			+ "\"results\":{\r\n"
 			+ "	\"numDocs\":1,\r\n"
 			+ "	\"data\":[\r\n"
@@ -80,217 +74,95 @@ class SearchServiceTest {
 			+ "			}]\r\n"
 			+ "	}\r\n"
 			+ "}";
-	private String failureResponseString = 
+	
+	private String notAcceptableResponseString = "{\"statusCode\":406,\"message\":\"Not Acceptable\"}";
+	
+	private String badRequestResponseString = 
 			"{\r\n"
 			+ "\"statusCode\":400,\r\n"
-			+ "\"responseMessage\":\"Could not execute query to fetch records. URL: %s\",\r\n"
+			+ "\"message\":\"Could not execute query to fetch records. URL: %s\",\r\n"
 			+ "\"results\":{}\r\n"
 			+ "}";
 	
+	public void setMockitoSuccessResponseService() {
+		jsonObject = new JSONObject(successResponseString);
+		Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+	}
+	
+	public void setMockitoNotAcceptableResponseService() {
+		jsonObject = new JSONObject(notAcceptableResponseString);
+		Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+	}
+	
+	public void setMockitoBadRequestResponseService() {
+		jsonObject = new JSONObject(badRequestResponseString);
+		Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+	}
+	
+	public void setMockitoExceptionService() {
+		Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenThrow(
+				new CustomException(HttpStatusCode.REQUEST_FORBIDDEN.getCode(), HttpStatusCode.REQUEST_FORBIDDEN,
+						HttpStatusCode.REQUEST_FORBIDDEN.getMessage()));
+	}
+	
+	
+	public SearchResponse searchViaQueryField() {
+		SearchResponse queryFieldResponse = searchService.setUpSelectQuerySearchViaQueryField(
+				tenantId, tableName, 
+				queryField, 
+				searchTerm, 
+				startRecord, pageSize, 
+				orderBy, order, Mockito.anyString());
+		return queryFieldResponse;
+	}
+	
+	public SearchResponse searchViaQuery() {
+		SearchResponse queryResponse = searchService.setUpSelectQuerySearchViaQuery(
+				tenantId, tableName, 
+				searchQuery,  
+				startRecord, pageSize, 
+				orderBy, order, Mockito.anyString());
+		return queryResponse;
+	}
 	@BeforeEach
 	public void init() {
 
 	}
 	
-	
-	public void setUpEndpointSearchViaQueryField() {
+	@Test
+	void searchViaQueryFieldTests() {
 		
-		apiEndpoint = 
-        		baseMicroserviceUrl + microserviceVersion + endpoint
-        		+ "/" + clientId
-        		+ "/" + tableName
-        		+ "?queryField=" + queryField + "&searchTerm=" + searchTerm
-        		+ "&startRecord=" + startRecord
-                + "&pageSize=" + pageSize
-                + "&orderBy=" + orderBy + "&order=" + order;
-
-	}
-	
-	
-	public void setUpEndpointSearchViaQuery() {
-		endpoint = "/query";
-		apiEndpoint = "null&null" + endpoint
-        		+ "/" + clientId
-        		+ "/" + tableName
-        		+ "?searchQuery=" + searchQuery
-        		+ "&startRecord=" + startRecord
-                + "&pageSize=" + pageSize
-                + "&orderBy=" + orderBy + "&order=" + order;
-	}
-
-	
-	public void setUpSearchViaQueryFieldResponse() {
-		receivedResponse = searchService.setUpSelectQuerySearchViaQueryField(
-				clientId, tableName, 
-				queryField, 
-				searchTerm, 
-				startRecord, pageSize, 
-				orderBy, order, 
-				
-				Mockito.anyString());
-	}
-	
-	public void setUpSearchViaQueryResponse() {
-		receivedResponse = searchService.setUpSelectQuerySearchViaQuery(
-				clientId, tableName, 
-				searchQuery, 
-				startRecord, pageSize, 
-				orderBy, order, 
-				Mockito.anyString());
-	}
-	
-
-	public void setMockitoSuccessResponseForService() {
-    	jsonObject = new JSONObject(successResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+		setMockitoSuccessResponseService();
+		assertEquals(200, searchViaQueryField().getStatusCode());
 		
-		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(200);
-    	expectedResponse.setMessage(TEST_PASSED);
-    	expectedResponse.setSolrDocuments(jsonObject.get("results"));
-	}
-	
-	public void setMockitoHalfSuccessResponseForService() {
-    	jsonObject = new JSONObject(successResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+		setMockitoNotAcceptableResponseService();
+		assertEquals(HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode(), searchViaQueryField().getStatusCode());
 		
-		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FIELD.getCode());
-    	expectedResponse.setMessage("Query-field validation unsuccessful. Query-field entry can only be in alphanumeric format");
-    	expectedResponse.setSolrDocuments(null);
-	}
-
-	public void setMockitoFailureResponseForService() {
-		failureResponseString = String.format(failureResponseString, apiEndpoint);
-    	jsonObject = new JSONObject(failureResponseString);
-    	Mockito.when(microserviceHttpGateway.getRequest(Mockito.anyString())).thenReturn(jsonObject);
+		setMockitoBadRequestResponseService();
+		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), searchViaQueryField().getStatusCode());
 		
-		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
-    	expectedResponse.setMessage(
-    			String.format(
-    					QUERY_PROCESS_ERROR, 
-    					"null"));
-    	expectedResponse.setSolrDocuments(null);
-	}
-	
-	public void setMockitoExceptionResponseForService() {
-		failureResponseString = String.format(failureResponseString, apiEndpoint);
-    	jsonObject = new JSONObject(failureResponseString);
-    	//Mockito.when(microserviceHttpGateway.getRequest()).thenReturn(jsonObject);
+		setMockitoExceptionService();
+		assertEquals(HttpStatusCode.REQUEST_FORBIDDEN.getCode(), searchViaQueryField().getStatusCode()) ;
 		
-		expectedResponse = new SearchResponse();
-    	expectedResponse.setStatusCode(HttpStatusCode.INVALID_QUERY_FORMAT.getCode());
-    	expectedResponse.setMessage(
-    			String.format(
-    					QUERY_PROCESS_ERROR, 
-    					"null"));
-    	expectedResponse.setSolrDocuments(null);
 	}
 	
 	
 	@Test
-	@DisplayName("Testing SetUpSelectQuerySearchViaQueryField")
-	void testSetUpSelectQuerySearchViaQueryField() {
-		logger.info("Test case for setUpSelectQuerySearchViaQueryField service method is getting executed..");
+	void searchViaQueryTests() {
+		
+		setMockitoSuccessResponseService();
+		assertEquals(200, searchViaQuery().getStatusCode());
+		
+		setMockitoNotAcceptableResponseService();
+		assertEquals(HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode(), searchViaQuery().getStatusCode());
+		
+		setMockitoBadRequestResponseService();
+		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), searchViaQuery().getStatusCode());
+		
+		setMockitoExceptionService();
+		assertEquals(HttpStatusCode.REQUEST_FORBIDDEN.getCode(), searchViaQuery().getStatusCode());
 
-		//==================================== Test Exception caught in service method ====================================
-		setUpEndpointSearchViaQueryField();
-		apiEndpoint = null;
-		setMockitoExceptionResponseForService();
-		setUpSearchViaQueryFieldResponse();
 		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments() == null && receivedResponse.getSolrDocuments() == null, 
-				is(true));
-		
-		//==================================== Test Failure ====================================
-		setUpEndpointSearchViaQueryField();
-		setMockitoFailureResponseForService();
-		setUpSearchViaQueryFieldResponse();
-		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments() == null && receivedResponse.getSolrDocuments() == null, 
-				is(true));
-		
-		//==================================== Test SUCCESS ====================================
-		// Query-field & search-term validated scenario
-		setUpEndpointSearchViaQueryField();
-		setMockitoSuccessResponseForService();
-		setUpSearchViaQueryFieldResponse();
-		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments().equals(receivedResponse.getSolrDocuments()), 
-				is(true));
-		
-		// Query-field & search-term NOT validated scenario
-		setUpEndpointSearchViaQueryField();
-		setMockitoHalfSuccessResponseForService();
-		queryField = "non_alpha-numeric_field";
-		searchTerm = "non_alpha-numeric_search-term";
-		setUpSearchViaQueryFieldResponse();
-		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments() == null && receivedResponse.getSolrDocuments() == null, 
-				is(true));
-	}
-	
-	
-	@Test
-	@DisplayName("Testing SetUpSelectQuerySearchViaQuery")
-	void testSetUpSelectQuerySearchViaQuery() {
-		logger.info("Test case for setUpSelectQuerySearchViaQuery service method is getting executed..");
-		
-		//==================================== Test Exception thrown ====================================
-		setUpEndpointSearchViaQuery();
-		apiEndpoint = null;
-		setMockitoExceptionResponseForService();
-		setUpSearchViaQueryResponse();
-
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments() == null && receivedResponse.getSolrDocuments() == null, 
-				is(true));
-		
-		
-		//==================================== Test Failure ====================================
-		setUpEndpointSearchViaQuery();
-		apiEndpoint = null;
-		setMockitoFailureResponseForService();
-		setUpSearchViaQueryResponse();
-		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments() == null && receivedResponse.getSolrDocuments() == null, 
-				is(true));
-		
-		//==================================== Test SUCCESS ====================================
-		setUpEndpointSearchViaQuery();
-		setMockitoSuccessResponseForService();
-		setUpSearchViaQueryResponse();
-		
-		assertEquals(expectedResponse.getStatusCode(), receivedResponse.getStatusCode());
-		assertEquals(expectedResponse.getMessage(), receivedResponse.getMessage());
-		assertThat(
-				"Expected SolrDocs should be equal to received SolrDocs", 
-				expectedResponse.getSolrDocuments().equals(receivedResponse.getSolrDocuments()), 
-				is(true));
 	}
 	
 }
